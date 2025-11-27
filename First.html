@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crown Banks - Send & Save Money</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        :root {
+            /* Palette mapped from project/style3.html (navy -> teal) */
+            --bg-1: #071428; /* deep navy */
+            --bg-2: #04283a; /* deep teal-blue */
+            --primary-color: #06b6d4; /* cyan accent */
+            --secondary-color: #14b8a6; /* teal accent */
+            --background-color: var(--bg-1);
+            --card-color: #ffffff;
+            --text-color: #111827; /* dark slate */
+            --text-light: #6b7280;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+        }
+        
+        body {
+            /* use a soft diagonal gradient background using the new palette */
+            background: linear-gradient(140deg, var(--bg-1) 0%, var(--bg-2) 60%);
+            /* background-color: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12)) (transparent),
+                              radial-gradient(900px 450px at 90% 90%, rgba(59,130,81,0.12)) (transparent)
+                              var(--background-color); */
+            -webkit-font-smoothing:antialiased;
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .screen {
+            display: none;
+            padding-bottom: 70px;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .header-action {
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        /* Balance Section */
+        .balance-section {
+            padding: 20px 15px;
+        }
+        
+        .balance-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .balance-amount {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .balance-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .balance-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .balance-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 0 15px;
+        }
+        
+        .section {
+            background: var(--card-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 5px;
+            border-radius: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .action-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .action-icon {
+            width: 45px;
+            height: 45px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .action-name {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .service-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 5px;
+            border-radius: 10px;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .service-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .service-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .service-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .hot-badge {
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        
+        /* Promo Sections */
+        .promo-section {
+            /* Use a radial gradient overlay for promo sections */
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: radial-gradient(circle at 10% 10%, rgba(6, 181, 212, 0.575), rgba(20, 184, 165, 0.582) 30%, rgba(7, 20, 40, 0.562) 100%);
+        }
+        
+        .promo-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .promo-info p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .promo-btn {
+            background-color: white;
+            color: var(--info-color);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .promo-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Rewards Section */
+        .rewards-section {
+            /* Use a conic gradient for an energetic badge-like background */
+            background: conic-gradient(from 200deg at 50% 50%, rgba(245, 159, 11, 0.815), rgba(6, 181, 212, 0.514), rgba(20, 184, 165, 0.486));
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .rewards-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .reward-item {
+            background-color: rgba(255, 255, 255, 0.342);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        /* Transaction History */
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+        
+        .transaction-details h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .transaction-details p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+        }
+        
+        .transaction-amount.positive {
+            color: var(--primary-color);
+        }
+        
+        .transaction-amount.negative {
+            color: var(--danger-color);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-icon {
+            margin-bottom: 4px;
+            font-size: 1.2rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        /* Input Styles */
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            display: none;
+            animation: slideIn 0.3s;
+            max-width: 300px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 350px) {
+            .quick-actions, .services-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .action-item, .service-item {
+                padding: 8px 3px;
+            }
+            
+            .action-name, .service-name {
+                font-size: 0.7rem;
+            }
+            
+            .balance-amount {
+                font-size: 1.8rem;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #121212;
+                --card-color: #1e1e1e;
+                --text-color: #ffffff;
+                --text-light: #aaaaaa;
+            }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Gradient utility classes (linear, radial, conic and repeating variants)
+           These use the palette variables above. Apply them anywhere.
+        */
+        .grad-linear {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .grad-linear-alt {
+            background: linear-gradient(150deg, var(--bg-1), var(--primary-color) 40%, var(--bg-2));
+        }
+
+        .grad-radial {
+            background: radial-gradient(circle at 20% 20%, rgba(6, 181, 212, 0.589), rgba(20, 184, 165, 0.61) 40%, transparent 60%);
+        }
+
+        .grad-conic {
+            background: conic-gradient(from 180deg at 50% 50%, var(--primary-color), var(--secondary-color), var(--bg-2));
+        }
+
+        .grad-rep-linear {
+            background: repeating-linear-gradient(45deg, rgba(6, 181, 212, 0.603) 0 10px, rgba(20, 184, 165, 0.514) 10px 20px);
+        }
+
+        .grad-rep-radial {
+            background: repeating-radial-gradient(circle at center, rgba(6, 181, 212, 0.521), rgba(6, 181, 212, 0.616) 5px, rgba(20,184,166,0.03) 5px 20px);
+        }
+
+        .grad-rep-conic {
+            background: repeating-conic-gradient(from 0deg, rgba(6, 181, 212, 0.568) 0deg 10deg, rgba(20, 184, 165, 0.548) 10deg 20deg);
+        }
+
+        /* Utility: gradient overlay for cards */
+        .card-gradient-overlay::before{
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: inherit;
+            background: linear-gradient(180deg, rgba(6,182,212,0.04), rgba(20,184,166,0.02));
+            pointer-events: none;
+        }
+
+        /* Bold hover / focus for light-colored backgrounds
+           - Lift and stronger shadow on hover
+           - Subtle cool border and slightly brighter surface
+           - Keyboard focus styles for accessibility
+        */
+        .section, .modal-content, .reward-item, .action-item, .service-item {
+            position: relative;
+            transition: transform 260ms var(--transition), box-shadow 260ms var(--transition), background 260ms var(--transition), border-color 260ms var(--transition);
+            will-change: transform, box-shadow;
+        }
+
+        .section:hover, .modal-content:hover, .reward-item:hover, .action-item:hover, .service-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 60px rgba(2,6,23,0.42);
+            border: 1px solid rgba(6,182,212,0.08);
+            background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(246,248,249,0.96));
+        }
+
+        /* Slightly less pronounced on small screens to avoid layout shift */
+        @media (max-width: 520px) {
+            .section:hover, .modal-content:hover, .reward-item:hover, .action-item:hover, .service-item:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 30px rgba(2,6,23,0.28);
+            }
+        }
+
+        /* Keyboard focus-visible support */
+        .section:focus-within, .modal-content:focus-within, .reward-item:focus, .action-item:focus, .service-item:focus {
+            outline: 3px solid rgba(6,182,212,0.12);
+            outline-offset: 4px;
+        }
+
+        
+        /* Scan QR Code */
+        .scan-container {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background-color: #f0f0f0;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Home Screen -->
+        <div class="screen active" id="home-screen">
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-title">Crown Banks</div>
+                    <div class="header-actions">
+                        <div class="header-action" id="scan-btn">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="header-action" id="notifications-btn">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="balance-section">
+                    <div class="balance-label">Available Balance</div>
+                    <div class="balance-amount" id="balance-amount">$2,450.75</div>
+                    <div class="balance-actions">
+                        <button class="balance-btn" id="add-money-btn">+ Add Money</button>
+                        <button class="balance-btn" id="send-money-btn">Send Money</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="quick-actions">
+                    <div class="action-item" data-action="to-opay">
+                        <div class="action-icon"><i class="fas fa-arrow-right"></i></div>
+                        <span class="action-name">To Crown Banks</span>
+                    </div>
+                    <div class="action-item" data-action="to-bank">
+                        <div class="action-icon"><i class="fas fa-university"></i></div>
+                        <span class="action-name">To Bank</span>
+                    </div>
+                    <div class="action-item" data-action="withdraw">
+                        <div class="action-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <span class="action-name">Withdraw</span>
+                    </div>
+                    <div class="action-item" data-action="pay-bills">
+                        <div class="action-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <span class="action-name">Pay Bills</span>
+                    </div>
+                </div>
+                
+                <div class="promo-section">
+                    <div class="promo-info">
+                        <h3>OJunior</h3>
+                        <p>Create a teenager's account for your child/ward today!</p>
+                    </div>
+                    <button class="promo-btn" id="ojunior-btn">Go</button>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Services</h2>
+                    <div class="services-grid">
+                        <div class="service-item" data-service="airtime">
+                            <div class="service-icon"><i class="fas fa-phone"></i></div>
+                            <span class="service-name">Airtime</span>
+                        </div>
+                        <div class="service-item" data-service="data">
+                            <div class="service-icon"><i class="fas fa-wifi"></i></div>
+                            <span class="service-name">Data</span>
+                            <div class="hot-badge">Hot</div>
+                        </div>
+                        <div class="service-item" data-service="betting">
+                            <div class="service-icon"><i class="fas fa-dice"></i></div>
+                            <span class="service-name">Betting</span>
+                        </div>
+                        <div class="service-item" data-service="tv">
+                            <div class="service-icon"><i class="fas fa-tv"></i></div>
+                            <span class="service-name">TV</span>
+                        </div>
+                        <div class="service-item" data-service="electricity">
+                            <div class="service-icon"><i class="fas fa-bolt"></i></div>
+                            <span class="service-name">Electricity</span>
+                        </div>
+                        <div class="service-item" data-service="transport">
+                            <div class="service-icon"><i class="fas fa-bus"></i></div>
+                            <span class="service-name">Transport</span>
+                        </div>
+                        <div class="service-item" data-service="loan">
+                            <div class="service-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                            <span class="service-name">Loan</span>
+                        </div>
+                        <div class="service-item" data-service="more">
+                            <div class="service-icon"><i class="fas fa-ellipsis-h"></i></div>
+                            <span class="service-name">More</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rewards-section">
+                    <h3>Special Bonus For You</h3>
+                    <p>Complete transactions to earn rewards!</p>
+                    <div class="rewards-grid">
+                        <div class="reward-item">+20 on ₦100 Betting</div>
+                        <div class="reward-item">+60 on ₦500 Betting</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Recent Transactions</h2>
+                    <div class="transaction-list" id="transaction-list">
+                        <!-- Transactions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rewards Screen -->
+        <div class="screen" id="rewards-screen">
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-title">Rewards</div>
+                    <div class="header-actions">
+                        <div class="header-action">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="balance-section">
+                    <div class="cashback-section">
+                        <span class="cashback-label">Cashback @</span>
+                        <span class="balance-amount">691.01 ></span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Friday Bonus</h2>
+                    <div class="services-grid">
+                        <div class="service-item" data-bonus="friday">
+                            <div class="service-icon">F</div>
+                            <span class="service-name">Friday Bonus</span>
+                        </div>
+                        <div class="service-item" data-bonus="refer">
+                            <div class="service-icon">R</div>
+                            <span class="service-name">Refer Friends</span>
+                        </div>
+                        <div class="service-item" data-bonus="spin">
+                            <div class="service-icon">S</div>
+                            <span class="service-name">Spin & Win</span>
+                        </div>
+                        <div class="service-item" data-bonus="play">
+                            <div class="service-icon">P</div>
+                            <span class="service-name">Play4aChild</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="promo-section">
+                    <div class="promo-info">
+                        <h3>Welcome Bonus</h3>
+                        <p>Total N380 Bonus</p>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">+20</div>
+                            <div class="transaction-details">
+                                <h4>Betting payment</h4>
+                                <p>Fund betting account with #100 or more</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">+60</div>
+                            <div class="transaction-details">
+                                <h4>Betting payment</h4>
+                                <p>Fund betting account with #500 or more</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">+100</div>
+                            <div class="transaction-details">
+                                <h4>Betting payment</h4>
+                                <p>Fund betting account with #1,000 or more</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Daily Bonus</h2>
+                    <p>Check back daily for new rewards!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Finance Screen -->
+        <div class="screen" id="finance-screen">
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-title">Finance</div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="section">
+                    <h2 class="section-title">My Cards</h2>
+                    <div class="promo-section" style="background: linear-gradient(to right, #9C27B0, #BA68C8);">
+                        <div class="promo-info">
+                            <h3>Virtual Card</h3>
+                            <p>**** **** **** 1234</p>
+                        </div>
+                        <button class="promo-btn">Manage</button>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Quick Actions</h2>
+                    <div class="quick-actions">
+                        <div class="action-item">
+                            <div class="action-icon"><i class="fas fa-piggy-bank"></i></div>
+                            <span class="action-name">Save</span>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                            <span class="action-name">Invest</span>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                            <span class="action-name">Loan</span>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon"><i class="fas fa-shield-alt"></i></div>
+                            <span class="action-name">Insurance</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Financial Tips</h2>
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon"><i class="fas fa-lightbulb"></i></div>
+                            <div class="transaction-details">
+                                <h4>Save automatically</h4>
+                                <p>Set up auto-save to grow your money effortlessly</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon"><i class="fas fa-chart-pie"></i></div>
+                            <div class="transaction-details">
+                                <h4>Track your spending</h4>
+                                <p>Monitor where your money goes each month</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cards Screen -->
+        <div class="screen" id="cards-screen">
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-title">Cards</div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="section">
+                    <h2 class="section-title">My Cards</h2>
+                    <div class="promo-section" style="background: linear-gradient(to right, #FF9800, #FFB74D);">
+                        <div class="promo-info">
+                            <h3>CrownBanks Virtual Card</h3>
+                            <p>Balance: $245.50</p>
+                        </div>
+                        <button class="promo-btn">Details</button>
+                    </div>
+                    
+                    <div class="promo-section" style="background: linear-gradient(to right, #2196F3, #64B5F6); margin-top: 15px;">
+                        <div class="promo-info">
+                            <h3>CrownBank Physical Card</h3>
+                            <p>Shipped: Oct 15, 2023</p>
+                        </div>
+                        <button class="promo-btn">Track</button>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Card Services</h2>
+                    <div class="quick-actions">
+                        <div class="action-item">
+                            <div class="action-icon"><i class="fas fa-lock"></i></div>
+                            <span class="action-name">Freeze Card</span>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon"><i class="fas fa-key"></i></div>
+                            <span class="action-name">Change PIN</span>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon"><i class="fas fa-eye"></i></div>
+                            <span class="action-name">View Details</span>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon"><i class="fas fa-redo"></i></div>
+                            <span class="action-name">Replace Card</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Screen -->
+        <div class="screen" id="profile-screen">
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-title">Profile</div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="section" style="text-align: center;">
+                    <div style="width: 80px; height: 80px; background-color: #f0f0f0; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2>PANASONIC</h2>
+                    <p style="color: var(--text-light);">PANASONIC@example.com</p>
+                    <p style="color: var(--text-light); margin-top: 5px;">+1 234 567 8900</p>
+                </div>
+                
+                <div class="section">
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon"><i class="fas fa-user-check"></i></div>
+                            <div class="transaction-details">
+                                <h4>Account Verification</h4>
+                                <p>Verified</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="transaction-details">
+                                <h4>Security</h4>
+                                <p>Manage your account security</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon"><i class="fas fa-question-circle"></i></div>
+                            <div class="transaction-details">
+                                <h4>Help & Support</h4>
+                                <p>Get help with your account</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon"><i class="fas fa-cog"></i></div>
+                            <div class="transaction-details">
+                                <h4>Settings</h4>
+                                <p>App preferences and settings</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <button class="btn btn-primary" style="width: 100%;" id="logout-btn">Log Out</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-screen="home">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" data-screen="rewards">
+                <div class="nav-icon"><i class="fas fa-gift"></i></div>
+                <span>Rewards</span>
+            </div>
+            <div class="nav-item" data-screen="finance">
+                <div class="nav-icon"><i class="fas fa-wallet"></i></div>
+                <span>Finance</span>
+            </div>
+            <div class="nav-item" data-screen="cards">
+                <div class="nav-icon"><i class="fas fa-credit-card"></i></div>
+                <span>Cards</span>
+            </div>
+            <div class="nav-item" data-screen="profile">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Me</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Money Modal -->
+    <div class="modal" id="add-money-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Money</h2>
+                <span class="close-modal" id="close-add-money-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="amount" class="input-label">Amount ($)</label>
+                    <input type="number" id="amount" class="input-field" placeholder="Enter amount">
+                </div>
+                <div class="input-group">
+                    <label for="payment-method" class="input-label">Payment Method</label>
+                    <select id="payment-method" class="input-field">
+                        <option value="card">Credit/Debit Card</option>
+                        <option value="bank">Bank Transfer</option>
+                        <option value="ussd">USSD</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="confirm-add-money">Add Money</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Send Money Modal -->
+    <div class="modal" id="send-money-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Send Money</h2>
+                <span class="close-modal" id="close-send-money-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="recipient" class="input-label">Recipient</label>
+                    <input type="text" id="recipient" class="input-field" placeholder="Enter recipient name or phone">
+                </div>
+                <div class="input-group">
+                    <label for="send-amount" class="input-label">Amount ($)</label>
+                    <input type="number" id="send-amount" class="input-field" placeholder="Enter amount">
+                </div>
+                <div class="input-group">
+                    <label for="send-note" class="input-label">Note (Optional)</label>
+                    <input type="text" id="send-note" class="input-field" placeholder="Add a note">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="confirm-send-money">Send Money</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scan QR Modal -->
+    <div class="modal" id="scan-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Scan QR Code</h2>
+                <span class="close-modal" id="close-scan-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="scan-container">
+                    <div class="qr-code">
+                        <i class="fas fa-qrcode" style="font-size: 3rem; color: #ccc;"></i>
+                    </div>
+                    <p>Position QR code within frame to scan</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary">Flashlight</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notification-text">Action completed successfully!</span>
+    </div>
+
+    <script>
+        // DOM Elements
+        const screens = document.querySelectorAll('.screen');
+        const navItems = document.querySelectorAll('.nav-item');
+        const addMoneyBtn = document.getElementById('add-money-btn');
+        const sendMoneyBtn = document.getElementById('send-money-btn');
+        const scanBtn = document.getElementById('scan-btn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        const balanceAmount = document.getElementById('balance-amount');
+        const transactionList = document.getElementById('transaction-list');
+        
+        // Modals
+        const addMoneyModal = document.getElementById('add-money-modal');
+        const sendMoneyModal = document.getElementById('send-money-modal');
+        const scanModal = document.getElementById('scan-modal');
+        
+        // Modal close buttons
+        const closeAddMoneyModal = document.getElementById('close-add-money-modal');
+        const closeSendMoneyModal = document.getElementById('close-send-money-modal');
+        const closeScanModal = document.getElementById('close-scan-modal');
+        
+        // Modal action buttons
+        const confirmAddMoney = document.getElementById('confirm-add-money');
+        const confirmSendMoney = document.getElementById('confirm-send-money');
+        
+        // Form inputs
+        const amountInput = document.getElementById('amount');
+        const sendAmountInput = document.getElementById('send-amount');
+        const recipientInput = document.getElementById('recipient');
+        
+        // Sample transaction data
+        const transactions = [
+            { id: 1, name: "Airtime Purchase", amount: -10.00, date: "2023-10-15", type: "airtime" },
+            { id: 2, name: "Data Bundle", amount: -15.00, date: "2023-10-14", type: "data" },
+            { id: 3, name: "Money Received", amount: 100.00, date: "2023-10-13", type: "transfer" },
+            { id: 4, name: "Electricity Bill", amount: -50.00, date: "2023-10-12", type: "bill" },
+            { id: 5, name: "Betting Fund", amount: -25.00, date: "2023-10-11", type: "betting" }
+        ];
+        
+        // Service icons mapping
+        const serviceIcons = {
+            airtime: "fas fa-phone",
+            data: "fas fa-wifi",
+            transfer: "fas fa-exchange-alt",
+            bill: "fas fa-file-invoice-dollar",
+            betting: "fas fa-dice"
+        };
+        
+        // Event Listeners
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const screenName = item.getAttribute('data-screen');
+                switchScreen(screenName, item);
+            });
+        });
+        
+        addMoneyBtn.addEventListener('click', () => {
+            addMoneyModal.style.display = 'flex';
+        });
+        
+        sendMoneyBtn.addEventListener('click', () => {
+            sendMoneyModal.style.display = 'flex';
+        });
+        
+        scanBtn.addEventListener('click', () => {
+            scanModal.style.display = 'flex';
+        });
+        
+        closeAddMoneyModal.addEventListener('click', () => {
+            addMoneyModal.style.display = 'none';
+        });
+        
+        closeSendMoneyModal.addEventListener('click', () => {
+            sendMoneyModal.style.display = 'none';
+        });
+        
+        closeScanModal.addEventListener('click', () => {
+            scanModal.style.display = 'none';
+        });
+        
+        confirmAddMoney.addEventListener('click', () => {
+            processAddMoney();
+        });
+        
+        confirmSendMoney.addEventListener('click', () => {
+            processSendMoney();
+        });
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === addMoneyModal) {
+                addMoneyModal.style.display = 'none';
+            }
+            if (e.target === sendMoneyModal) {
+                sendMoneyModal.style.display = 'none';
+            }
+            if (e.target === scanModal) {
+                scanModal.style.display = 'none';
+            }
+        });
+        
+        // Functions
+        function switchScreen(screenName, navItem) {
+            // Hide all screens
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(`${screenName}-screen`).classList.add('active');
+            
+            // Update active nav item
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            navItem.classList.add('active');
+        }
+        
+        function processAddMoney() {
+            const amount = parseFloat(amountInput.value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                showNotification("Please enter a valid amount.", "error");
+                return;
+            }
+            
+            // Update balance
+            const currentBalance = parseFloat(balanceAmount.textContent.replace('$', '').replace(',', ''));
+            const newBalance = currentBalance + amount;
+            balanceAmount.textContent = formatCurrency(newBalance);
+            
+            // Add transaction
+            transactions.unshift({
+                id: transactions.length + 1,
+                name: "Money Added",
+                amount: amount,
+                date: new Date().toISOString().split('T')[0],
+                type: "add-money"
+            });
+            
+            renderTransactions();
+            
+            // Show success message
+            showNotification(`Successfully added $${amount.toFixed(2)} to your account!`);
+            
+            // Close modal and reset form
+            addMoneyModal.style.display = 'none';
+            amountInput.value = '';
+        }
+        
+        function processSendMoney() {
+            const amount = parseFloat(sendAmountInput.value);
+            const recipient = recipientInput.value.trim();
+            
+            if (isNaN(amount) || amount <= 0) {
+                showNotification("Please enter a valid amount.", "error");
+                return;
+            }
+            
+            if (recipient === '') {
+                showNotification("Please enter a recipient.", "error");
+                return;
+            }
+            
+            // Check if sufficient balance
+            const currentBalance = parseFloat(balanceAmount.textContent.replace('$', '').replace(',', ''));
+            if (amount > currentBalance) {
+                showNotification("Insufficient balance for this transaction.", "error");
+                return;
+            }
+            
+            // Update balance
+            const newBalance = currentBalance - amount;
+            balanceAmount.textContent = formatCurrency(newBalance);
+            
+            // Add transaction
+            transactions.unshift({
+                id: transactions.length + 1,
+                name: `Sent to ${recipient}`,
+                amount: -amount,
+                date: new Date().toISOString().split('T')[0],
+                type: "transfer"
+            });
+            
+            renderTransactions();
+            
+            // Show success message
+            showNotification(`Successfully sent $${amount.toFixed(2)} to ${recipient}!`);
+            
+            // Close modal and reset form
+            sendMoneyModal.style.display = 'none';
+            sendAmountInput.value = '';
+            recipientInput.value = '';
+        }
+        
+        function renderTransactions() {
+            transactionList.innerHTML = '';
+            
+            // Show only the first 5 transactions
+            const recentTransactions = transactions.slice(0, 5);
+            
+            recentTransactions.forEach(transaction => {
+                const transactionItem = document.createElement('div');
+                transactionItem.className = 'transaction-item';
+                
+                const iconClass = serviceIcons[transaction.type] || 'fas fa-exchange-alt';
+                
+                transactionItem.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-icon">
+                            <i class="${iconClass}"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <h4>${transaction.name}</h4>
+                            <p>${formatDate(transaction.date)}</p>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${transaction.amount > 0 ? 'positive' : 'negative'}">
+                        ${transaction.amount > 0 ? '+' : ''}${formatCurrency(transaction.amount)}
+                    </div>
+                `;
+                
+                transactionList.appendChild(transactionItem);
+            });
+        }
+        
+        function showNotification(message, type = "success") {
+            notificationText.textContent = message;
+            
+            if (type === "error") {
+                notification.style.backgroundColor = "var(--danger-color)";
+            } else {
+                notification.style.backgroundColor = "var(--primary-color)";
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        function formatCurrency(amount) {
+            const absAmount = Math.abs(amount);
+            return '$' + absAmount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+        
+        function formatDate(dateString) {
+            const options = { month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Format the initial balance
+            const initialBalance = parseFloat(balanceAmount.textContent.replace('$', '').replace(',', ''));
+            balanceAmount.textContent = formatCurrency(initialBalance);
+            
+            // Render transactions
+            renderTransactions();
+            
+            // Add click handlers for service items
+            document.querySelectorAll('.service-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const service = item.getAttribute('data-service');
+                    showNotification(`Opening ${service} service...`);
+                });
+            });
+            
+            // Add click handlers for action items
+            document.querySelectorAll('.action-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const action = item.getAttribute('data-action');
+                    handleQuickAction(action);
+                });
+            });
+        });
+        
+        function handleQuickAction(action) {
+            switch(action) {
+                case 'to-opay':
+                    showNotification("Opening transfer to OPay user...");
+                    break;
+                case 'to-bank':
+                    showNotification("Opening bank transfer...");
+                    break;
+                case 'withdraw':
+                    showNotification("Opening cash withdrawal...");
+                    break;
+                case 'pay-bills':
+                    showNotification("Opening bill payment...");
+                    break;
+            }
+        }
+    </script>
+</script>
+    <script src="styles/sound-toggle.js"></script>
+    <script src="styles/theme-toggle.js"></script>
+    <script src="styles/fireworks.js"></script>
+</body>
+</html>

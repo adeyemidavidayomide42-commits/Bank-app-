@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crown Banks - Secure Your Future</title>
+  <link rel="stylesheet" href="styles/style.css" />
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="navbar">
+    <div class="logo">Crown<span>Pays</span></div>
+    <nav class="nav-links" id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="menu-icon" id="menuIcon">&#9776;</div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1>Welcome to <span>Crown Banks</span></h1>
+      <p>Your trusted partner in secure and smart banking.</p>
+      <button onclick="location.href='style3.html'" class="btn-primary">Open Account</button>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services" id="services">
+    <h2>Our Services</h2>
+    <div class="service-container">
+      <div class="service-card">
+        <h3>Online Banking</h3>
+        <p>Manage your finances from anywhere with 24/7 online access.</p>
+      </div>
+      <div class="service-card">
+        <h3>Loans & Credits</h3>
+        <p>Flexible loan options with competitive interest rates.</p>
+      </div>
+      <div class="service-card">
+        <h3>Savings Account</h3>
+        <p>Grow your savings safely with high interest returns.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <h2>Why Choose Us</h2>
+    <p>Crownpays offers the most secure and innovative banking solutions. We value transparency, customer satisfaction, and cutting-edge technology.</p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <p>With mission to make financial services more inclusive through technology, Adepays is dedicated to providing secure, easy to use & affordable financial services with super fast user experience, amazing incentive package on transfer/airtime & data top-up, innovative product to use as balance with amazing daily interest, reliable debit card with no charge and best resolution experience etc. With OPay account, you can have full control of your finances, payments & transactions with ease, all on one platform!</p>
+    <p>© 2025 Crown Banks. All rights reserved.</p>
+  </footer>
+
+  <!-- Fireworks script (injects canvas automatically) -->
+  <script src="styles/sound-toggle.js"></script>
+  <script src="styles/theme-toggle.js"></script>
+  <script src="styles/fireworks.js"></script>
+
+  <!-- Small UI script -->
+  <script>
+    (function(){
+      const menuIcon = document.getElementById('menuIcon');
+      const navLinks = document.getElementById('navLinks');
+      if(menuIcon && navLinks){
+        menuIcon.addEventListener('click', () => navLinks.classList.toggle('show'));
+      }
+    })();
+  </script>
+
+</body>
+</html>
